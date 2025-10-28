@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Treino Diário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 
+        ==================================================
+        CORES E ESTILOS PRINCIPAIS - ALTERE AQUI
+        ==================================================
+        */
+        :root {
+            /* Cores principais - personalize conforme desejado */
+            --primary-color: #4F46E5; /* Roxo/Índigo principal */
+            --primary-light: #818CF8; /* Roxo claro */
+            --primary-dark: #4338CA; /* Roxo escuro */
+            --secondary-color: #10B981; /* Verde secundário */
+            --text-color: #1F2937; /* Cinza escuro para texto */
+            --text-light: #6B7280; /* Cinza claro para texto secundário */
+            --background: #F9FAFB; /* Fundo claro */
+            --card-bg: #FFFFFF; /* Fundo dos cards */
+            --border-color: #E5E7EB; /* Cor das bordas */
+            --success-color: #10B981; /* Verde para sucesso */
+            --danger-color: #EF4444; /* Vermelho para perigo */
+            --warning-color: #0000ff; /* Amarelo para aviso */
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* Transições */
+            --transition: all 0.3s ease;
+            --transition-fast: all 0.15s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 
+        ==================================================
+        HEADER E NAVEGAÇÃO
+        ==================================================
+        */
+        header {
+            background: var(--card-bg);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .site-title i {
+            color: var(--primary-color);
+        }
+
+        .nav-days {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-days li {
+            position: relative;
+        }
+
+        .nav-days a {
+            display: block;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 600;
+            border-radius: 0.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-days a:hover {
+            color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .nav-days a.active {
+            color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.15);
+        }
+
+        .nav-days a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        /* 
+        ==================================================
+        CONTEÚDO PRINCIPAL
+        ==================================================
+        */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .day-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .day-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .day-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .add-exercise-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-exercise-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* 
+        ==================================================
+        CARDS DE EXERCÍCIO COMPACTOS - UM AO LADO DO OUTRO
+        ==================================================
+        */
+        .exercises-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .exercise-card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .exercise-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+        }
+
+        .exercise-card-actions {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .exercise-card:hover .exercise-card-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: var(--background);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            z-index: 10;
+        }
+
+        .action-btn:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .exercise-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .exercise-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .similar-exercise {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .weight-info {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .weight-value {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .weight-unit {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* 
+        ==================================================
+        MODAL DETALHADO DO EXERCÍCIO
+        ==================================================
+        */
+        .exercise-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .exercise-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .exercise-modal-content {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.9);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .exercise-modal.active .exercise-modal-content {
+            transform: scale(1);
+        }
+
+        .exercise-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .exercise-modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .close-exercise-modal {
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .close-exercise-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .exercise-modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: var(--background);
+        }
+
+        .modal-video iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-details {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .modal-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .modal-detail-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        .modal-detail-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .modal-similar-exercise {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .modal-weight-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-weight-value {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.25rem;
+        }
+
+        .modal-weight-unit {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--secondary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .no-video-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-light);
+            font-size: 1.5rem;
+        }
+
+        /* 
+        ==================================================
+        FORMULÁRIO MODAL
+        ==================================================
+        */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .weight-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .weight-input {
+            flex: 1;
+        }
+
+        .unit-select {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .unit-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--background);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        /* 
+        ==================================================
+        RESPONSIVIDADE
+        ==================================================
+        */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .nav-days {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-days a {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .main-content {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+            
+            .day-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .weight-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .modal-content,
+            .exercise-modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            
+            .exercises-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 0.75rem;
+            }
+            
+            .exercise-card {
+                padding: 0.75rem;
+            }
+            
+            .exercise-name {
+                font-size: 1rem;
+            }
+            
+            .action-btn {
+                width: 20px;
+                height: 20px;
+                font-size: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-days a {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            
+            .exercise-card-actions {
+                top: 0.25rem;
+                right: 0.25rem;
+            }
+            
+            .exercises-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercise-modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+        }
+
+        /* 
+        ==================================================
+        MENSAGENS DE STATUS
+        ==================================================
+        */
+        .no-exercises {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+            grid-column: 1 / -1;
+        }
+
+        .no-exercises i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="site-title">
+                <i class="fas fa-dumbbell"></i>
+                Meu Treino Diário
+            </div>
+            <ul class="nav-days" id="navDays">
+                <li><a href="#" data-day="segunda" class="active">Segunda</a></li>
+                <li><a href="#" data-day="terca">Terça</a></li>
+                <li><a href="#" data-day="quarta">Quarta</a></li>
+                <li><a href="#" data-day="quinta">Quinta</a></li>
+                <li><a href="#" data-day="sexta">Sexta</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Seção de Segunda -->
+        <section id="segunda" class="day-section active">
+            <div class="day-header">
+                <h2 class="day-title">Segunda-feira</h2>
+                <button class="add-exercise-btn" onclick="openModal('segunda')">
+                    <i class="fas fa-plus"></i> Adicionar Exercício
+                </button>
+            </div>
+            <div class="exercises-container" id="exercises-segunda">
+                <div class="no-exercises">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhum exercício cadastrado para segunda-feira</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Terça -->
+        <section id="terca" class="day-section">
+            <div class="day-header">
+                <h2 class="day-title">Terça-feira</h2>
+                <button class="add-exercise-btn" onclick="openModal('terca')">
+                    <i class="fas fa-plus"></i> Adicionar Exercício
+                </button>
+            </div>
+            <div class="exercises-container" id="exercises-terca">
+                <div class="no-exercises">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhum exercício cadastrado para terça-feira</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Quarta -->
+        <section id="quarta" class="day-section">
+            <div class="day-header">
+                <h2 class="day-title">Quarta-feira</h2>
+                <button class="add-exercise-btn" onclick="openModal('quarta')">
+                    <i class="fas fa-plus"></i> Adicionar Exercício
+                </button>
+            </div>
+            <div class="exercises-container" id="exercises-quarta">
+                <div class="no-exercises">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhum exercício cadastrado para quarta-feira</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Quinta -->
+        <section id="quinta" class="day-section">
+            <div class="day-header">
+                <h2 class="day-title">Quinta-feira</h2>
+                <button class="add-exercise-btn" onclick="openModal('quinta')">
+                    <i class="fas fa-plus"></i> Adicionar Exercício
+                </button>
+            </div>
+            <div class="exercises-container" id="exercises-quinta">
+                <div class="no-exercises">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhum exercício cadastrado para quinta-feira</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Sexta -->
+        <section id="sexta" class="day-section">
+            <div class="day-header">
+                <h2 class="day-title">Sexta-feira</h2>
+                <button class="add-exercise-btn" onclick="openModal('sexta')">
+                    <i class="fas fa-plus"></i> Adicionar Exercício
+                </button>
+            </div>
+            <div class="exercises-container" id="exercises-sexta">
+                <div class="no-exercises">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhum exercício cadastrado para sexta-feira</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal detalhado do exercício -->
+    <div class="exercise-modal" id="exerciseDetailModal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h3 class="exercise-modal-title" id="detailModalTitle">Nome do Exercício</h3>
+                <button class="close-exercise-modal" onclick="closeExerciseDetailModal()">&times;</button>
+            </div>
+            <div class="exercise-modal-body" id="detailModalBody">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar/editar exercícios -->
+    <div class="modal" id="exerciseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Adicionar Exercício</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="exerciseForm">
+                <input type="hidden" id="currentDay">
+                <input type="hidden" id="exerciseId">
+                
+                <div class="form-group">
+                    <label class="form-label" for="exerciseName">Nome do Exercício</label>
+                    <input type="text" id="exerciseName" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="exerciseVideo">Link do Vídeo (YouTube)</label>
+                    <input type="url" id="exerciseVideo" class="form-input" placeholder="https://youtube.com/watch?v=...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="similarExercise">Exercício Semelhante</label>
+                    <input type="text" id="similarExercise" class="form-input" placeholder="Ex: Agachamento com halteres">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Carga Utilizada</label>
+                    <div class="weight-group">
+                        <div class="weight-input">
+                            <input type="number" id="weightValue" class="form-input" min="0" step="0.5" placeholder="Ex: 20">
+                        </div>
+                        <select id="weightUnit" class="unit-select">
+                            <option value="kg">kg</option>
+                            <option value="placas">placas</option>
+                            <!-- 
+                            ==================================================
+                            UNIDADES DE PESO - ALTERE/ADICIONE AQUI
+                            ==================================================
+                            Para adicionar novas unidades, basta adicionar mais options:
+                            <option value="lbs">lbs</option>
+                            <option value="reps">reps</option>
+                            -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Salvar Exercício</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /*
+        ==================================================
+        ARQUITETURA DE DADOS - ALTERE AQUI PARA EXPANDIR
+        ==================================================
+        Estrutura atual de um exercício:
+        {
+            id: string (timestamp único),
+            name: string,
+            video: string (URL do YouTube),
+            similar: string,
+            weight: number,
+            unit: string ('kg' ou 'placas')
+        }
+        
+        Para adicionar novos campos, modifique:
+        1. A estrutura do objeto acima
+        2. O formulário HTML (adicionar novos inputs)
+        3. As funções createExerciseCard() e createExerciseDetailCard() para exibir o novo campo
+        4. A função saveExercise() para salvar o novo campo
+        */
+
+        // Estado atual
+        let currentDay = 'segunda';
+        let editingExercise = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            loadExercises();
+            setupEventListeners();
+        });
+
+        // Configurar listeners de eventos
+        function setupEventListeners() {
+            // Navegação entre dias
+            document.querySelectorAll('.nav-days a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const day = this.dataset.day;
+                    switchDay(day);
+                });
+            });
+
+            // Formulário de exercício
+            document.getElementById('exerciseForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveExercise();
+            });
+
+            // Modal de formulário
+            document.getElementById('exerciseModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Modal de detalhes
+            document.getElementById('exerciseDetailModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeExerciseDetailModal();
+                }
+            });
+        }
+
+        // Alternar entre dias da semana
+        function switchDay(day) {
+            // Atualizar navegação
+            document.querySelectorAll('.nav-days a').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.day === day) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Mostrar seção do dia selecionado
+            document.querySelectorAll('.day-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(day).classList.add('active');
+
+            currentDay = day;
+        }
+
+        // Abrir modal para adicionar/editar exercício
+        function openModal(day, exercise = null) {
+            currentDay = day;
+            const modal = document.getElementById('exerciseModal');
+            const form = document.getElementById('exerciseForm');
+            
+            // Resetar formulário
+            form.reset();
+            document.getElementById('currentDay').value = day;
+            document.getElementById('exerciseId').value = '';
+            document.getElementById('modalTitle').textContent = exercise ? 'Editar Exercício' : 'Adicionar Exercício';
+            
+            if (exercise) {
+                // Preencher formulário com dados do exercício
+                document.getElementById('exerciseName').value = exercise.name;
+                document.getElementById('exerciseVideo').value = exercise.video || '';
+                document.getElementById('similarExercise').value = exercise.similar || '';
+                document.getElementById('weightValue').value = exercise.weight || '';
+                document.getElementById('weightUnit').value = exercise.unit || 'kg';
+                document.getElementById('exerciseId').value = exercise.id;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        // Fechar modal de formulário
+        function closeModal() {
+            document.getElementById('exerciseModal').classList.remove('active');
+        }
+
+        // Fechar modal de detalhes
+        function closeExerciseDetailModal() {
+            document.getElementById('exerciseDetailModal').classList.remove('active');
+        }
+
+        // Salvar exercício
+        function saveExercise() {
+            const form = document.getElementById('exerciseForm');
+            const day = document.getElementById('currentDay').value;
+            const exerciseId = document.getElementById('exerciseId').value;
+            
+            const exercise = {
+                id: exerciseId || Date.now().toString(),
+                name: document.getElementById('exerciseName').value,
+                video: document.getElementById('exerciseVideo').value,
+                similar: document.getElementById('similarExercise').value,
+                weight: parseFloat(document.getElementById('weightValue').value) || 0,
+                unit: document.getElementById('weightUnit').value
+            };
+            
+            // Validar YouTube URL
+            if (exercise.video && !isValidYouTubeUrl(exercise.video)) {
+                alert('Por favor, insira um link válido do YouTube ou deixe em branco.');
+                return;
+            }
+            
+            let exercises = getExercisesForDay(day);
+            
+            if (exerciseId) {
+                // Editar exercício existente
+                const index = exercises.findIndex(ex => ex.id === exerciseId);
+                if (index !== -1) {
+                    exercises[index] = exercise;
+                }
+            } else {
+                // Adicionar novo exercício
+                exercises.push(exercise);
+            }
+            
+            saveExercisesForDay(day, exercises);
+            renderExercises(day);
+            closeModal();
+        }
+
+        // Validar URL do YouTube
+        function isValidYouTubeUrl(url) {
+            if (!url) return true; // Permitir campo vazio
+            const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+            return pattern.test(url);
+        }
+
+        // Excluir exercício
+        function deleteExercise(day, exerciseId) {
+            if (confirm('Tem certeza que deseja excluir este exercício?')) {
+                let exercises = getExercisesForDay(day);
+                exercises = exercises.filter(ex => ex.id !== exerciseId);
+                saveExercisesForDay(day, exercises);
+                renderExercises(day);
+            }
+        }
+
+        // Editar exercício
+        function editExercise(day, exerciseId) {
+            const exercises = getExercisesForDay(day);
+            const exercise = exercises.find(ex => ex.id === exerciseId);
+            if (exercise) {
+                openModal(day, exercise);
+            }
+        }
+
+        // Abrir modal detalhado do exercício
+        function openExerciseDetail(exercise) {
+            const modal = document.getElementById('exerciseDetailModal');
+            const title = document.getElementById('detailModalTitle');
+            const body = document.getElementById('detailModalBody');
+            
+            title.textContent = exercise.name;
+            
+            // Extrair ID do vídeo do YouTube
+            let videoId = '';
+            if (exercise.video) {
+                const url = new URL(exercise.video);
+                if (url.hostname.includes('youtube.com')) {
+                    videoId = url.searchParams.get('v') || '';
+                } else if (url.hostname.includes('youtu.be')) {
+                    videoId = url.pathname.substring(1);
+                }
+            }
+            
+            const videoEmbed = videoId ? 
+                `<div class="modal-video">
+                    <iframe src="https://www.youtube.com/embed/${videoId}" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>` : 
+                `<div class="modal-video">
+                    <div class="no-video-placeholder">
+                        <i class="fas fa-video-slash"></i>
+                    </div>
+                </div>`;
+            
+            body.innerHTML = `
+                ${videoEmbed}
+                <div class="modal-details">
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">Exercício Semelhante</span>
+                        <span class="modal-detail-value modal-similar-exercise">${exercise.similar || 'Não especificado'}</span>
+                    </div>
+                    <div class="modal-detail-item">
+                        <span class="modal-detail-label">Carga Utilizada</span>
+                        <div class="modal-weight-info">
+                            <span class="modal-weight-value">${exercise.weight || 0}</span>
+                            <span class="modal-weight-unit">${exercise.unit}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Obter exercícios de um dia específico
+        function getExercisesForDay(day) {
+            const data = localStorage.getItem(`exercises_${day}`);
+            return data ? JSON.parse(data) : [];
+        }
+
+        // Salvar exercícios de um dia específico
+        function saveExercisesForDay(day, exercises) {
+            localStorage.setItem(`exercises_${day}`, JSON.stringify(exercises));
+        }
+
+        // Carregar todos os exercícios
+        function loadExercises() {
+            ['segunda', 'terca', 'quarta', 'quinta', 'sexta'].forEach(day => {
+                renderExercises(day);
+            });
+        }
+
+        // Renderizar exercícios de um dia
+        function renderExercises(day) {
+            const container = document.getElementById(`exercises-${day}`);
+            const exercises = getExercisesForDay(day);
+            
+            if (exercises.length === 0) {
+                container.innerHTML = `
+                    <div class="no-exercises">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Nenhum exercício cadastrado para ${getDayName(day)}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            exercises.forEach(exercise => {
+                const card = createExerciseCard(exercise, day);
+                container.appendChild(card);
+            });
+        }
+
+        // Criar card de exercício compacto
+        function createExerciseCard(exercise, day) {
+            const card = document.createElement('div');
+            card.className = 'exercise-card';
+            
+            // Clicar no card abre o modal detalhado
+            card.addEventListener('click', function(e) {
+                // Verificar se o clique foi em um botão de ação
+                if (e.target.closest('.action-btn')) {
+                    return;
+                }
+                openExerciseDetail(exercise);
+            });
+            
+            card.innerHTML = `
+                <div class="exercise-card-actions">
+                    <button class="action-btn edit-btn" onclick="editExercise('${day}', '${exercise.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn" onclick="deleteExercise('${day}', '${exercise.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="exercise-name">${exercise.name}</div>
+                <div class="exercise-summary">
+                    <div class="similar-exercise">${exercise.similar || 'Sem exercício semelhante'}</div>
+                    <div class="weight-info">
+                        <span class="weight-value">${exercise.weight || 0}</span>
+                        <span class="weight-unit">${exercise.unit}</span>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Obter nome do dia para exibição
+        function getDayName(day) {
+            const days = {
+                'segunda': 'segunda-feira',
+                'terca': 'terça-feira',
+                'quarta': 'quarta-feira',
+                'quinta': 'quinta-feira',
+                'sexta': 'sexta-feira'
+            };
+            return days[day] || day;
+        }
+    </script>
+</body>
+</html>
+
